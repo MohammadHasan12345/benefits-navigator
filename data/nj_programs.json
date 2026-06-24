@@ -1,0 +1,66 @@
+[
+  {
+    "name": "NJ SNAP (Food Stamps)",
+    "category": "food",
+    "description": "Monthly food assistance benefits loaded onto an EBT card",
+    "eligibility": "NJ residents with low income, any immigration status may apply",
+    "documents": ["Photo ID", "Proof of NJ residence", "Proof of income or unemployment"],
+    "apply_link": "https://www.nj.gov/humanservices/dfd/programs/snap/"
+  },
+  {
+    "name": "NJ WIC Program",
+    "category": "food",
+    "description": "Food, nutrition counseling for pregnant women, new mothers, and children under 5",
+    "eligibility": "Pregnant, postpartum, or breastfeeding women; infants and children under 5 with low income",
+    "documents": ["Proof of identity", "Proof of NJ residence", "Proof of income", "Medical documentation if available"],
+    "apply_link": "https://www.nj.gov/health/fhs/wic/"
+  },
+  {
+    "name": "NJ FamilyCare (Medicaid)",
+    "category": "healthcare",
+    "description": "Free or low cost health insurance for NJ residents",
+    "eligibility": "NJ residents who meet income limits, includes children, parents, pregnant women",
+    "documents": ["Proof of identity", "Proof of NJ residence", "Proof of income", "Social Security number if available"],
+    "apply_link": "https://www.nj.gov/humanservices/dmahs/clients/medicaid/"
+  },
+  {
+    "name": "LIHEAP (Utility Assistance)",
+    "category": "utilities",
+    "description": "Help paying heating and cooling energy bills",
+    "eligibility": "NJ residents with low income who pay energy bills",
+    "documents": ["Photo ID", "Proof of NJ residence", "Proof of income", "Recent utility bill"],
+    "apply_link": "https://www.nj.gov/dca/divisions/dhcr/offices/hea.html"
+  },
+  {
+    "name": "NJ Rental Assistance (DCA)",
+    "category": "housing",
+    "description": "Emergency rental assistance for NJ residents at risk of eviction",
+    "eligibility": "NJ renters experiencing financial hardship",
+    "documents": ["Photo ID", "Proof of NJ residence", "Lease agreement", "Proof of income", "Eviction notice if applicable"],
+    "apply_link": "https://www.nj.gov/dca/divisions/dhcr/offices/era.html"
+  },
+  {
+    "name": "NJ Child Care Assistance (CCAP)",
+    "category": "childcare",
+    "description": "Subsidized childcare for working low income families",
+    "eligibility": "Working or in school NJ parents with children under 13 with low income",
+    "documents": ["Proof of identity", "Proof of NJ residence", "Proof of income", "Proof of employment or school enrollment", "Child birth certificate"],
+    "apply_link": "https://www.nj.gov/humanservices/dfd/programs/cc/"
+  },
+  {
+    "name": "NJ Legal Services",
+    "category": "legal",
+    "description": "Free civil legal help for low income NJ residents including immigration issues",
+    "eligibility": "Low income NJ residents needing civil legal assistance",
+    "documents": ["Photo ID", "Description of legal issue"],
+    "apply_link": "https://www.lsnj.org/"
+  },
+  {
+    "name": "NJ Unemployment Insurance",
+    "category": "employment",
+    "description": "Weekly payments if you lost your job through no fault of your own",
+    "eligibility": "NJ workers who lost jobs involuntarily and meet wage requirements",
+    "documents": ["Social Security number", "Work history for past 18 months", "Banking info for direct deposit"],
+    "apply_link": "https://myunemployment.nj.gov/"
+  }
+]

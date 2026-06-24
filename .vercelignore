@@ -1,0 +1,10 @@
+# Keep the Python ADK reference out of the Vercel bundle (Vercel only needs public/ + api/)
+agents/
+data/
+__pycache__/
+main.py
+web.py
+mcp_server.py
+static/
+requirements.txt
+*.pyc

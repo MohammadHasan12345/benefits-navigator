@@ -1,0 +1,6 @@
+# Python (CLI / local ADK version) — NOT used by the Vercel deployment.
+google-adk>=2.3.0
+google-genai>=2.9.0
+python-dotenv>=1.2.0
+fastapi>=0.138.0
+uvicorn>=0.49.0
