@@ -6,272 +6,340 @@
 <title>Benefits Navigator — Find help you may qualify for in New Jersey</title>
 <style>
   :root{
-    --bg:#f3f8f6;
-    --bg2:#e8f3ef;
-    --ink:#10261f;
-    --ink-soft:#4a5d57;
+    --bg:#f4f9f7;
+    --bg2:#eaf4f0;
+    --ink:#0b211b;
+    --ink-soft:#46615a;
     --teal:#0f766e;
     --teal-2:#14b8a6;
-    --emerald:#059669;
+    --emerald:#10b981;
     --amber:#f59e0b;
-    --coral:#fb7185;
+    --sky:#38bdf8;
+    --violet:#8b5cf6;
     --card:#ffffff;
-    --line:rgba(15,118,110,.12);
-    --shadow:0 18px 50px -20px rgba(13,80,70,.45);
-    --shadow-sm:0 8px 24px -14px rgba(13,80,70,.40);
-    --radius:22px;
+    --line:rgba(15,118,110,.13);
+    --shadow:0 24px 60px -22px rgba(11,70,60,.5);
+    --shadow-sm:0 10px 28px -16px rgba(11,70,60,.42);
+    --radius:24px;
     --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{
-    font-family:var(--font);
-    color:var(--ink);
-    background:radial-gradient(1200px 700px at 80% -10%,#d9f2ea 0%,transparent 55%),
-               radial-gradient(900px 600px at -10% 20%,#e7f0fb 0%,transparent 50%),
-               linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
-    min-height:100vh;
-    overflow-x:hidden;
-    line-height:1.55;
+    font-family:var(--font);color:var(--ink);background:var(--bg);
+    min-height:100vh;overflow-x:hidden;line-height:1.55;-webkit-font-smoothing:antialiased;
   }
 
-  /* ---------- floating ambient blobs ---------- */
-  .blobs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-  .blob{position:absolute;border-radius:50%;filter:blur(50px);opacity:.5;mix-blend-mode:multiply}
-  .blob.b1{width:380px;height:380px;background:#9ae6cf;top:-80px;left:-60px;animation:float1 18s ease-in-out infinite}
-  .blob.b2{width:320px;height:320px;background:#bcd7ff;top:40%;right:-90px;animation:float2 22s ease-in-out infinite}
-  .blob.b3{width:300px;height:300px;background:#ffe1a8;bottom:-100px;left:35%;animation:float3 20s ease-in-out infinite}
-  @keyframes float1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,60px) scale(1.08)}}
-  @keyframes float2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-50px,40px) scale(1.12)}}
-  @keyframes float3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-50px) scale(1.05)}}
+  /* ===== animated aurora background ===== */
+  .aurora{position:fixed;inset:0;z-index:0;pointer-events:none;filter:blur(54px);opacity:.7}
+  .aurora::before,.aurora::after,.aurora i{content:"";position:absolute;border-radius:50%}
+  .aurora::before{width:40vw;height:40vw;background:#8eeccf;top:-8%;left:-4%;animation:drift1 24s ease-in-out infinite}
+  .aurora::after{width:36vw;height:36vw;background:#c6def8;bottom:-10%;right:-4%;animation:drift2 28s ease-in-out infinite}
+  .aurora i{width:32vw;height:32vw;background:#ffe6b0;top:42%;left:46%;animation:drift3 32s ease-in-out infinite}
+  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(8vw,6vh) scale(1.15)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-7vw,-5vh) scale(1.2)}}
+  @keyframes drift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-6vw,7vh) scale(1.1)}}
+  /* fine grain texture */
+  .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  /* cursor spotlight */
+  .spotlight{position:fixed;width:520px;height:520px;border-radius:50%;z-index:1;pointer-events:none;
+    background:radial-gradient(circle,rgba(20,184,166,.18),transparent 62%);transform:translate(-50%,-50%);
+    left:50%;top:30%;transition:opacity .4s;opacity:0}
 
-  .wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 24px}
+  .wrap{position:relative;z-index:2;max-width:1120px;margin:0 auto;padding:0 24px}
 
-  /* ---------- nav ---------- */
-  nav{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
-  .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.12rem;letter-spacing:-.01em}
-  .brand .mark{
-    width:38px;height:38px;border-radius:12px;
-    background:linear-gradient(135deg,var(--teal),var(--teal-2));
-    display:grid;place-items:center;color:#fff;box-shadow:var(--shadow-sm);
-  }
-  .brand .mark svg{width:21px;height:21px}
-  .nav-pill{
-    font-size:.8rem;font-weight:600;color:var(--teal);
-    background:rgba(15,118,110,.10);padding:7px 14px;border-radius:999px;
-    border:1px solid var(--line);
-  }
+  /* ===== nav ===== */
+  nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+    padding:16px 24px;max-width:1120px;margin:0 auto;transition:all .3s}
+  nav.scrolled{background:rgba(244,249,247,.82);backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);border-radius:0 0 18px 18px;box-shadow:var(--shadow-sm)}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:850;font-size:1.14rem;letter-spacing:-.02em}
+  .brand .mark{width:40px;height:40px;border-radius:13px;
+    background:linear-gradient(135deg,var(--teal),var(--teal-2));display:grid;place-items:center;color:#fff;
+    box-shadow:0 8px 22px -8px rgba(15,118,110,.7);animation:floaty 5s ease-in-out infinite}
+  @keyframes floaty{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(-4deg)}}
+  .brand .mark svg{width:22px;height:22px}
+  .nav-right{display:flex;align-items:center;gap:16px}
+  .nav-link{font-size:.9rem;font-weight:600;color:var(--ink-soft);text-decoration:none;transition:color .2s}
+  .nav-link:hover{color:var(--teal)}
+  .nav-pill{font-size:.78rem;font-weight:700;color:var(--teal);background:rgba(15,118,110,.10);
+    padding:8px 14px;border-radius:999px;border:1px solid var(--line)}
 
-  /* ---------- hero ---------- */
-  header.hero{padding:46px 0 30px;text-align:center}
-  .eyebrow{
-    display:inline-flex;align-items:center;gap:8px;
-    font-size:.82rem;font-weight:600;color:var(--teal);
-    background:#fff;border:1px solid var(--line);
-    padding:8px 16px;border-radius:999px;box-shadow:var(--shadow-sm);
-    margin-bottom:22px;
-  }
+  /* ===== hero ===== */
+  header.hero{padding:64px 0 34px;text-align:center;position:relative}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:.82rem;font-weight:700;color:var(--teal);
+    background:rgba(255,255,255,.8);border:1px solid var(--line);padding:8px 16px;border-radius:999px;
+    box-shadow:var(--shadow-sm);margin-bottom:26px}
   .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--emerald);animation:pulse 1.8s infinite}
-  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(5,150,105,.5)}50%{box-shadow:0 0 0 7px rgba(5,150,105,0)}}
-  h1{
-    font-size:clamp(2.2rem,5.5vw,3.7rem);
-    font-weight:850;line-height:1.05;letter-spacing:-.025em;margin-bottom:18px;
-  }
-  h1 .grad{
-    background:linear-gradient(100deg,var(--teal) 0%,var(--teal-2) 45%,var(--emerald) 100%);
-    background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
-    animation:shimmer 6s linear infinite;
-  }
-  @keyframes shimmer{to{background-position:200% center}}
-  .sub{font-size:clamp(1.02rem,2vw,1.22rem);color:var(--ink-soft);max-width:600px;margin:0 auto 26px}
-  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-  .btn{
-    font:inherit;font-weight:700;font-size:1rem;cursor:pointer;border:none;
-    padding:15px 28px;border-radius:14px;transition:transform .18s,box-shadow .18s;
-    display:inline-flex;align-items:center;gap:9px;
-  }
-  .btn-primary{background:linear-gradient(135deg,var(--teal),var(--teal-2));color:#fff;box-shadow:var(--shadow)}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.5)}50%{box-shadow:0 0 0 8px rgba(16,185,129,0)}}
+
+  h1{font-size:clamp(2.4rem,6.4vw,4.6rem);font-weight:880;line-height:1.02;letter-spacing:-.035em;margin-bottom:22px}
+  h1 .word{display:inline-block;opacity:0;transform:translateY(28px) rotate(3deg);filter:blur(8px);
+    animation:wordIn .8s cubic-bezier(.2,.8,.2,1) forwards}
+  @keyframes wordIn{to{opacity:1;transform:none;filter:blur(0)}}
+  h1 .grad{background:linear-gradient(100deg,var(--teal),var(--teal-2) 40%,var(--emerald) 75%,var(--amber));
+    background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:shimmer 5s linear infinite}
+  @keyframes shimmer{to{background-position:220% center}}
+
+  .sub{font-size:clamp(1.04rem,2vw,1.28rem);color:var(--ink-soft);max-width:620px;margin:0 auto 16px;
+    opacity:0;animation:fadeUp .8s .5s forwards}
+  .rotor{display:inline-flex;align-items:center;height:1.3em;overflow:hidden;vertical-align:bottom;
+    font-weight:800;color:var(--teal)}
+  .rotor span{display:block;animation:roll 9s infinite}
+  @keyframes roll{0%,12%{transform:translateY(0)}16%,28%{transform:translateY(-100%)}
+    32%,44%{transform:translateY(-200%)}48%,60%{transform:translateY(-300%)}
+    64%,76%{transform:translateY(-400%)}80%,100%{transform:translateY(-500%)}}
+
+  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:18px;
+    opacity:0;animation:fadeUp .8s .7s forwards}
+  .btn{font:inherit;font-weight:750;font-size:1.02rem;cursor:pointer;border:none;position:relative;overflow:hidden;
+    padding:16px 30px;border-radius:15px;transition:transform .2s,box-shadow .2s;
+    display:inline-flex;align-items:center;gap:10px;will-change:transform}
+  .btn-primary{background:linear-gradient(135deg,var(--teal),var(--teal-2));color:#fff;
+    box-shadow:0 16px 36px -14px rgba(15,118,110,.85)}
+  .btn-primary::after{content:"";position:absolute;inset:0;transform:translateX(-130%);
+    background:linear-gradient(105deg,transparent,rgba(255,255,255,.45),transparent)}
   .btn-primary:hover{transform:translateY(-3px)}
-  .btn-ghost{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow-sm)}
+  .btn-primary:hover::after{transform:translateX(130%);transition:transform .8s}
+  .btn-ghost{background:rgba(255,255,255,.75);color:var(--ink);border:1px solid var(--line);
+    box-shadow:var(--shadow-sm)}
   .btn-ghost:hover{transform:translateY(-3px)}
 
-  .trust{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-top:30px;color:var(--ink-soft);font-size:.88rem;font-weight:500}
+  .trust{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-top:30px;color:var(--ink-soft);
+    font-size:.88rem;font-weight:600;opacity:0;animation:fadeUp .8s .9s forwards}
   .trust span{display:inline-flex;align-items:center;gap:7px}
   .trust svg{width:16px;height:16px;color:var(--emerald)}
 
-  /* ---------- reveal animation ---------- */
-  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+  /* stat counters */
+  .stats{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:40px}
+  .stat{background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:18px;padding:16px 24px;
+    min-width:130px;box-shadow:var(--shadow-sm)}
+  .stat b{display:block;font-size:1.9rem;font-weight:850;letter-spacing:-.02em;
+    background:linear-gradient(135deg,var(--teal),var(--emerald));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat small{color:var(--ink-soft);font-size:.8rem;font-weight:600}
+
+  /* marquee */
+  .marquee{margin:42px 0 0;-webkit-mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+    mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);overflow:hidden}
+  .marquee ul{display:flex;gap:12px;width:max-content;animation:scroll 26s linear infinite;padding:4px 0;list-style:none}
+  .marquee li{display:flex;align-items:center;gap:8px;white-space:nowrap;font-weight:600;font-size:.9rem;
+    color:var(--ink);background:rgba(255,255,255,.72);border:1px solid var(--line);padding:9px 16px;border-radius:999px}
+  @keyframes scroll{to{transform:translateX(-50%)}}
+
+  /* ===== reveal ===== */
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
   .reveal.in{opacity:1;transform:none}
 
-  /* ---------- chat app ---------- */
-  .app{
-    margin:48px auto 30px;background:var(--card);border-radius:28px;
-    box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.6);overflow:hidden;
-  }
-  .app-top{
-    padding:18px 24px;border-bottom:1px solid var(--line);
-    display:flex;align-items:center;justify-content:space-between;gap:14px;
-    background:linear-gradient(180deg,#fbfffd,#f4faf8);
-  }
-  .app-top .title{display:flex;align-items:center;gap:11px;font-weight:700}
-  .avatar{
-    width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--teal),var(--emerald));
-    display:grid;place-items:center;color:#fff;
-  }
-  .avatar svg{width:18px;height:18px}
+  /* ===== chat app ===== */
+  .app{margin:54px auto 30px;position:relative;border-radius:30px;background:var(--card);
+    box-shadow:var(--shadow);overflow:hidden}
+  .app::before{content:"";position:absolute;inset:0;padding:1.4px;border-radius:30px;
+    background:linear-gradient(135deg,var(--teal-2),transparent 35%,transparent 65%,var(--emerald));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:.6}
+  .app-top{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;
+    justify-content:space-between;gap:14px;background:linear-gradient(180deg,#fbfffd,#f3faf7)}
+  .app-top .title{display:flex;align-items:center;gap:12px;font-weight:750}
+  .avatar{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--teal),var(--emerald));
+    display:grid;place-items:center;color:#fff;box-shadow:0 8px 18px -8px rgba(15,118,110,.8)}
+  .avatar svg{width:19px;height:19px}
   .status{font-size:.78rem;color:var(--ink-soft);display:flex;align-items:center;gap:6px}
   .status .live{width:8px;height:8px;border-radius:50%;background:var(--emerald);animation:pulse 1.8s infinite}
 
-  /* pipeline */
-  .pipeline{display:flex;gap:8px;padding:14px 24px 4px;flex-wrap:wrap}
-  .step{
-    flex:1;min-width:120px;display:flex;align-items:center;gap:10px;
-    padding:10px 13px;border-radius:14px;border:1px solid var(--line);background:#fbfdfc;
-    transition:all .35s;
-  }
-  .step .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex-shrink:0;
+  /* pipeline with progress rail */
+  .pipeline{position:relative;display:flex;gap:8px;padding:16px 24px 6px}
+  .pipeline .rail{position:absolute;left:54px;right:54px;top:50%;height:3px;background:var(--line);border-radius:3px;z-index:0}
+  .pipeline .rail i{position:absolute;inset:0;width:0;background:linear-gradient(90deg,var(--teal),var(--emerald));
+    border-radius:3px;transition:width .5s ease}
+  .step{position:relative;z-index:1;flex:1;min-width:120px;display:flex;align-items:center;gap:10px;
+    padding:10px 13px;border-radius:14px;border:1px solid var(--line);background:#fbfdfc;transition:all .35s}
+  .step .ic{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;
     background:rgba(15,118,110,.10);color:var(--teal);transition:all .35s}
   .step .ic svg{width:16px;height:16px}
   .step .lbl{font-size:.78rem;line-height:1.2}
-  .step .lbl b{display:block;font-size:.84rem}
+  .step .lbl b{display:block;font-size:.85rem}
   .step .lbl small{color:var(--ink-soft)}
-  .step.active{border-color:var(--teal-2);background:#effbf7;box-shadow:0 0 0 3px rgba(20,184,166,.12)}
+  .step.active{border-color:var(--teal-2);background:#effbf7;box-shadow:0 0 0 4px rgba(20,184,166,.13)}
   .step.active .ic{background:linear-gradient(135deg,var(--teal),var(--teal-2));color:#fff;animation:bob .9s ease-in-out infinite}
   .step.done .ic{background:var(--emerald);color:#fff}
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 
-  /* category chips */
   .chips{display:flex;gap:9px;padding:14px 24px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
-  .chip{
-    font:inherit;font-size:.85rem;font-weight:600;cursor:pointer;
-    border:1px solid var(--line);background:#fff;color:var(--ink);
-    padding:9px 14px;border-radius:999px;display:inline-flex;align-items:center;gap:7px;
-    transition:transform .15s,background .15s,color .15s,border-color .15s;
-  }
-  .chip:hover{transform:translateY(-2px);border-color:var(--teal-2);color:var(--teal)}
+  .chip{font:inherit;font-size:.85rem;font-weight:650;cursor:pointer;border:1px solid var(--line);
+    background:#fff;color:var(--ink);padding:9px 14px;border-radius:999px;display:inline-flex;align-items:center;gap:7px;
+    transition:transform .15s,background .15s,color .15s,border-color .15s,box-shadow .15s}
+  .chip:hover{transform:translateY(-2px);border-color:var(--teal-2);color:var(--teal);box-shadow:var(--shadow-sm)}
   .chip .e{font-size:1rem}
 
-  .chat{height:440px;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
+  .chat{height:452px;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px}
   .chat::-webkit-scrollbar{width:9px}
   .chat::-webkit-scrollbar-thumb{background:rgba(15,118,110,.18);border-radius:9px}
 
-  .msg{display:flex;gap:11px;max-width:88%;animation:slideIn .45s cubic-bezier(.2,.7,.2,1)}
-  @keyframes slideIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-  .msg .bubble{padding:14px 17px;border-radius:18px;font-size:.96rem}
+  .msg{display:flex;gap:11px;max-width:90%;animation:slideIn .5s cubic-bezier(.2,.7,.2,1)}
+  @keyframes slideIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  .msg .bubble{padding:14px 18px;border-radius:20px;font-size:.97rem}
   .msg.bot .bubble{background:#f1f7f5;border:1px solid var(--line);border-top-left-radius:6px}
   .msg.user{align-self:flex-end;flex-direction:row-reverse}
-  .msg.user .bubble{background:linear-gradient(135deg,var(--teal),var(--teal-2));color:#fff;border-top-right-radius:6px}
-  .msg .mini{
-    width:32px;height:32px;border-radius:10px;flex-shrink:0;display:grid;place-items:center;color:#fff;
-    background:linear-gradient(135deg,var(--teal),var(--emerald));
-  }
-  .msg.user .mini{background:#cbd5d1;color:#0f766e}
-  .msg .mini svg{width:17px;height:17px}
+  .msg.user .bubble{background:linear-gradient(135deg,var(--teal),var(--teal-2));color:#fff;border-top-right-radius:6px;
+    box-shadow:0 12px 26px -14px rgba(15,118,110,.8)}
+  .msg .mini{width:34px;height:34px;border-radius:11px;flex-shrink:0;display:grid;place-items:center;color:#fff;
+    background:linear-gradient(135deg,var(--teal),var(--emerald))}
+  .msg.user .mini{background:#cdd9d5;color:#0f766e}
+  .msg .mini svg{width:18px;height:18px}
 
-  .bubble a{color:var(--teal);font-weight:600}
-  .bubble p{margin:.35em 0}
-  .pcard{
-    border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin:10px 0;background:#fff;
-    box-shadow:var(--shadow-sm);
-  }
-  .pcard .pname{font-weight:700;margin:4px 0 6px}
-  .badge{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;
-    padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.02em}
+  .bubble a{color:var(--teal);font-weight:650}
+  .bubble p{margin:.4em 0}
+  .pcard{border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:11px 0;background:#fff;
+    box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s}
+  .pcard:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+  .pcard .pname{font-weight:780;margin:5px 0 7px;font-size:1.02rem}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:800;
+    padding:4px 11px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em}
   .badge.ok{background:#dcfce7;color:#15803d}
   .badge.maybe{background:#fef3c7;color:#b45309}
   .badge.no{background:#fee2e2;color:#b91c1c}
-  .pcard .row{font-size:.86rem;color:var(--ink-soft);margin:3px 0}
+  .pcard .row{font-size:.87rem;color:var(--ink-soft);margin:4px 0}
   .pcard .row b{color:var(--ink)}
-  .applylink{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:.85rem;font-weight:700;
-    color:#fff;background:linear-gradient(135deg,var(--teal),var(--teal-2));padding:8px 13px;border-radius:10px;text-decoration:none}
+  .applylink{display:inline-flex;align-items:center;gap:6px;margin-top:9px;font-size:.85rem;font-weight:750;
+    color:#fff;background:linear-gradient(135deg,var(--teal),var(--teal-2));padding:9px 14px;border-radius:11px;
+    text-decoration:none;box-shadow:var(--shadow-sm);transition:transform .15s}
+  .applylink:hover{transform:translateY(-2px)}
 
-  /* typing */
-  .typing{display:flex;gap:5px;align-items:center;padding:14px 17px}
+  .typing{display:flex;gap:5px;align-items:center;padding:14px 18px}
   .typing span{width:8px;height:8px;border-radius:50%;background:var(--teal-2);animation:typing 1.2s infinite}
   .typing span:nth-child(2){animation-delay:.18s}
   .typing span:nth-child(3){animation-delay:.36s}
   @keyframes typing{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
 
-  /* composer */
   .composer{display:flex;gap:11px;padding:16px 20px;border-top:1px solid var(--line);background:#fbfffd}
-  .composer input{
-    flex:1;font:inherit;font-size:.98rem;padding:14px 17px;border-radius:14px;
-    border:1px solid var(--line);background:#fff;outline:none;transition:border-color .2s,box-shadow .2s;
-  }
-  .composer input:focus{border-color:var(--teal-2);box-shadow:0 0 0 4px rgba(20,184,166,.13)}
-  .send{
-    width:52px;height:52px;border-radius:14px;border:none;cursor:pointer;flex-shrink:0;
+  .composer input{flex:1;font:inherit;font-size:.99rem;padding:15px 18px;border-radius:15px;
+    border:1px solid var(--line);background:#fff;outline:none;transition:border-color .2s,box-shadow .2s}
+  .composer input:focus{border-color:var(--teal-2);box-shadow:0 0 0 4px rgba(20,184,166,.14)}
+  .send{width:54px;height:54px;border-radius:15px;border:none;cursor:pointer;flex-shrink:0;
     background:linear-gradient(135deg,var(--teal),var(--teal-2));color:#fff;display:grid;place-items:center;
-    transition:transform .15s;box-shadow:var(--shadow-sm);
-  }
-  .send:hover{transform:translateY(-2px) scale(1.04)}
+    transition:transform .15s;box-shadow:var(--shadow-sm)}
+  .send:hover{transform:translateY(-2px) scale(1.05)}
   .send:disabled{opacity:.5;cursor:not-allowed;transform:none}
   .send svg{width:20px;height:20px}
 
-  /* ---------- how it works ---------- */
-  section.how{padding:54px 0 20px;text-align:center}
-  .how h2{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:800;letter-spacing:-.02em;margin-bottom:12px}
-  .how .lead{color:var(--ink-soft);max-width:520px;margin:0 auto 38px}
-  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-  .feature{
-    background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px 22px;text-align:left;
-    box-shadow:var(--shadow-sm);transition:transform .25s,box-shadow .25s;
-  }
-  .feature:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
-  .feature .num{font-size:.8rem;font-weight:800;color:var(--teal-2)}
-  .feature .ficon{
-    width:50px;height:50px;border-radius:14px;display:grid;place-items:center;margin:10px 0 14px;
-    background:linear-gradient(135deg,rgba(15,118,110,.12),rgba(20,184,166,.16));color:var(--teal);
-  }
-  .feature .ficon svg{width:25px;height:25px}
-  .feature h3{font-size:1.12rem;margin-bottom:7px}
-  .feature p{color:var(--ink-soft);font-size:.93rem}
+  /* ===== section heading ===== */
+  .sec{padding:64px 0 16px;text-align:center}
+  .sec .kicker{font-size:.8rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-2)}
+  .sec h2{font-size:clamp(1.7rem,3.8vw,2.7rem);font-weight:850;letter-spacing:-.025em;margin:10px 0 12px}
+  .sec .lead{color:var(--ink-soft);max-width:560px;margin:0 auto 40px}
 
-  /* ---------- footer ---------- */
-  footer{padding:40px 0 56px;text-align:center;color:var(--ink-soft);font-size:.85rem}
-  .disclaimer{
-    background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 20px;
-    max-width:680px;margin:0 auto 22px;box-shadow:var(--shadow-sm);font-size:.86rem;
-  }
+  /* ===== compare (vs generic AI) ===== */
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;text-align:left}
+  .col{border-radius:var(--radius);padding:26px 24px;border:1px solid var(--line)}
+  .col.generic{background:rgba(255,255,255,.55)}
+  .col.ours{background:linear-gradient(160deg,#ffffff,#f0faf6);box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .col.ours::before{content:"";position:absolute;width:240px;height:240px;border-radius:50%;
+    background:radial-gradient(circle,rgba(20,184,166,.18),transparent 70%);top:-80px;right:-60px}
+  .col h3{font-size:1.16rem;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+  .col ul{list-style:none}
+  .col li{display:flex;gap:11px;padding:9px 0;font-size:.94rem;color:var(--ink-soft);align-items:flex-start}
+  .col li svg{width:19px;height:19px;flex-shrink:0;margin-top:1px}
+  .col.generic li svg{color:#cf6b6b}
+  .col.ours li{color:var(--ink)}
+  .col.ours li svg{color:var(--emerald)}
+  .tag{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 9px;border-radius:7px}
+  .tag.g{background:#f1f1f1;color:#888}
+  .tag.o{background:#dcfce7;color:#15803d}
+
+  /* ===== how it works ===== */
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;text-align:left}
+  .feature{background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:var(--radius);
+    padding:28px 24px;box-shadow:var(--shadow-sm);transition:transform .3s,box-shadow .3s;position:relative;overflow:hidden}
+  .feature::after{content:"";position:absolute;width:160px;height:160px;border-radius:50%;top:-60px;right:-50px;
+    background:radial-gradient(circle,rgba(20,184,166,.14),transparent 70%);opacity:0;transition:opacity .3s}
+  .feature:hover{transform:translateY(-8px);box-shadow:var(--shadow)}
+  .feature:hover::after{opacity:1}
+  .feature .num{font-size:.78rem;font-weight:850;color:var(--teal-2);letter-spacing:.08em}
+  .feature .ficon{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;margin:12px 0 16px;
+    background:linear-gradient(135deg,rgba(15,118,110,.14),rgba(20,184,166,.2));color:var(--teal)}
+  .feature .ficon svg{width:26px;height:26px}
+  .feature h3{font-size:1.16rem;margin-bottom:8px}
+  .feature p{color:var(--ink-soft);font-size:.94rem}
+
+  /* ===== final CTA ===== */
+  .finalcta{margin:64px 0 20px;border-radius:30px;padding:54px 28px;text-align:center;position:relative;overflow:hidden;
+    background:linear-gradient(135deg,#0f766e,#0b9c83 55%,#10b981);color:#fff;box-shadow:var(--shadow)}
+  .finalcta::before{content:"";position:absolute;inset:0;opacity:.4;
+    background:radial-gradient(500px 300px at 20% 10%,rgba(255,255,255,.35),transparent 60%),
+              radial-gradient(400px 300px at 85% 90%,rgba(255,226,166,.4),transparent 60%)}
+  .finalcta h2{position:relative;font-size:clamp(1.7rem,4vw,2.6rem);font-weight:850;letter-spacing:-.02em;margin-bottom:12px}
+  .finalcta p{position:relative;opacity:.92;max-width:480px;margin:0 auto 24px}
+  .finalcta .btn{position:relative;background:#fff;color:var(--teal)}
+
+  /* ===== footer ===== */
+  footer{padding:36px 0 60px;text-align:center;color:var(--ink-soft);font-size:.85rem}
+  .disclaimer{background:rgba(255,255,255,.8);border:1px solid var(--line);border-radius:16px;padding:16px 20px;
+    max-width:700px;margin:24px auto 22px;box-shadow:var(--shadow-sm);font-size:.86rem}
   .disclaimer b{color:var(--ink)}
 
   @media(max-width:760px){
-    .grid3{grid-template-columns:1fr}
-    .chat{height:60vh}
-    .trust{gap:16px}
+    .grid3,.compare{grid-template-columns:1fr}
+    .chat{height:62vh}
+    .trust,.stats{gap:14px}
     .pipeline .step .lbl small{display:none}
+    .pipeline .rail{display:none}
+    nav .nav-link{display:none}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.1s!important}
+    h1 .word{opacity:1;filter:none;transform:none}
+    .sub,.cta-row,.trust{opacity:1}
   }
 </style>
 </head>
 <body>
-<div class="blobs"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+<div class="aurora"><i></i></div>
+<div class="grain"></div>
+<div class="spotlight" id="spotlight"></div>
+
+<nav id="nav">
+  <div class="brand">
+    <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/><path d="M9 21v-6h6v6"/></svg></span>
+    Benefits Navigator
+  </div>
+  <div class="nav-right">
+    <a class="nav-link" href="#how">How it works</a>
+    <a class="nav-link" href="#why">Why it's different</a>
+    <span class="nav-pill">NJ · Free &amp; Private</span>
+  </div>
+</nav>
 
 <div class="wrap">
-  <nav>
-    <div class="brand">
-      <span class="mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/><path d="M9 21v-6h6v6"/></svg>
-      </span>
-      Benefits Navigator
-    </div>
-    <span class="nav-pill">New Jersey · Free &amp; Private</span>
-  </nav>
-
   <header class="hero">
-    <div class="eyebrow reveal"><span class="dot"></span> Powered by a 3-agent AI assistant</div>
-    <h1 class="reveal">Find the help you<br><span class="grad">may qualify for</span></h1>
-    <p class="sub reveal">Describe your situation in your own words. In seconds, Benefits Navigator finds New Jersey assistance programs and builds a clear, step-by-step action checklist — no jargon, no judgment.</p>
-    <div class="cta-row reveal">
-      <button class="btn btn-primary" onclick="document.getElementById('app').scrollIntoView()">
+    <div class="eyebrow"><span class="dot"></span> Powered by a 3-agent AI assistant</div>
+    <h1 id="headline"></h1>
+    <p class="sub">Real New Jersey help for
+      <span class="rotor"><span>food&nbsp;🍎<br>rent&nbsp;🏠<br>healthcare&nbsp;🩺<br>utilities&nbsp;💡<br>childcare&nbsp;🧸<br>food&nbsp;🍎</span></span>
+      — described in your own words, returned as a clear action plan.</p>
+    <div class="cta-row">
+      <button class="btn btn-primary magnetic" onclick="document.getElementById('app').scrollIntoView()">
         Start now — it's free
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </button>
-      <button class="btn btn-ghost" onclick="document.getElementById('how').scrollIntoView()">How it works</button>
+      <button class="btn btn-ghost magnetic" onclick="document.getElementById('why').scrollIntoView()">Why it's different</button>
     </div>
-    <div class="trust reveal">
-      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Private — no SSN or income figures</span>
-      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> All immigration statuses welcome</span>
-      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Results in under a minute</span>
+    <div class="trust">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> No SSN or income figures</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> All immigration statuses</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Answers in under a minute</span>
+    </div>
+
+    <div class="stats reveal">
+      <div class="stat"><b data-count="8">0</b><small>NJ programs matched</small></div>
+      <div class="stat"><b data-count="7">0</b><small>categories of help</small></div>
+      <div class="stat"><b data-count="100" data-suffix="%">0</b><small>private &amp; free</small></div>
+      <div class="stat"><b data-count="60" data-suffix="s">0</b><small>to an action plan</small></div>
+    </div>
+
+    <div class="marquee reveal">
+      <ul id="marquee"></ul>
     </div>
   </header>
 
@@ -284,6 +352,7 @@
     </div>
 
     <div class="pipeline" id="pipeline">
+      <div class="rail"><i id="rail"></i></div>
       <div class="step" data-step="intake"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span class="lbl"><b>Intake</b><small>understands you</small></span></div>
       <div class="step" data-step="research"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><span class="lbl"><b>Research</b><small>finds programs</small></span></div>
       <div class="step" data-step="eligibility"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="lbl"><b>Eligibility</b><small>builds checklist</small></span></div>
@@ -309,8 +378,36 @@
     </div>
   </div>
 
+  <!-- ============ WHY DIFFERENT ============ -->
+  <section class="sec" id="why">
+    <div class="kicker reveal">Not just another chatbot</div>
+    <h2 class="reveal">Why this beats a generic AI</h2>
+    <p class="lead reveal">Generic assistants guess. Benefits Navigator is grounded in real, verified New Jersey programs — and acts like a caseworker, not a search box.</p>
+    <div class="compare">
+      <div class="col generic reveal">
+        <h3><span class="tag g">Generic AI</span></h3>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg> Can invent fake programs &amp; broken links</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg> Vague, generic advice</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg> You assemble every next step</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg> Often asks for sensitive data</li>
+        </ul>
+      </div>
+      <div class="col ours reveal">
+        <h3><span class="tag o">Benefits Navigator</span></h3>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Grounded in a <b>verified NJ database</b> — only real programs &amp; official .nj.gov links</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Real <b>eligibility triage</b>: likely / maybe / probably not</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> A <b>ready action checklist</b>: documents, where &amp; how to apply</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> <b>Private by design</b> — never asks for SSN or income</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ HOW IT WORKS ============ -->
-  <section class="how" id="how">
+  <section class="sec" id="how">
+    <div class="kicker reveal">Under the hood</div>
     <h2 class="reveal">Three AI agents, working together</h2>
     <p class="lead reveal">Like a caseworker who never gets tired — each agent handles one part of the journey, so you get clear answers fast.</p>
     <div class="grid3">
@@ -324,7 +421,7 @@
         <div class="num">STEP 02</div>
         <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
         <h3>The Research Agent searches</h3>
-        <p>It scans New Jersey assistance programs — food, housing, healthcare, utilities, childcare, legal and employment — to find every match.</p>
+        <p>It scans a verified New Jersey program database — food, housing, healthcare, utilities, childcare, legal and employment — to find every match.</p>
       </div>
       <div class="feature reveal">
         <div class="num">STEP 03</div>
@@ -335,6 +432,13 @@
     </div>
   </section>
 
+  <!-- ============ FINAL CTA ============ -->
+  <div class="finalcta reveal">
+    <h2>Help is closer than you think.</h2>
+    <p>Describe your situation in one sentence. In under a minute, you'll have a clear, private plan.</p>
+    <button class="btn magnetic" onclick="document.getElementById('input').focus();document.getElementById('app').scrollIntoView()">Talk to the Navigator →</button>
+  </div>
+
   <footer>
     <div class="disclaimer reveal">
       <b>This is not legal or financial advice.</b> Benefits Navigator helps you discover programs you <em>may</em> qualify for. Please contact each program directly to confirm your eligibility.
@@ -344,138 +448,167 @@
 </div>
 
 <script>
-const chat = document.getElementById('chat');
-const input = document.getElementById('input');
-const sendBtn = document.getElementById('send');
-const steps = [...document.querySelectorAll('.step')];
+// ===== hero headline word-by-word reveal =====
+(function(){
+  const words = ["Find","the","help","you","__GRAD__may qualify for"];
+  const h = document.getElementById('headline');
+  h.innerHTML = words.map((w,i)=>{
+    const grad = w.startsWith("__GRAD__");
+    const txt = grad ? w.replace("__GRAD__","") : w;
+    return `<span class="word"${grad?' style="--g:1"':''} data-i="${i}">${grad?`<span class="grad">${txt}</span>`:txt}</span>`;
+  }).join(" ");
+  h.querySelectorAll('.word').forEach((s,i)=>s.style.animationDelay=(0.12+i*0.11)+'s');
+})();
 
-// persistent session id so the agent remembers the conversation
-let sessionId = localStorage.getItem('bn_session') || (crypto.randomUUID ? crypto.randomUUID() : Date.now()+''+Math.random());
-localStorage.setItem('bn_session', sessionId);
+// ===== marquee content =====
+(function(){
+  const items=[["🍎","Food assistance"],["🏠","Rental help"],["🩺","Health insurance"],["💡","Utility bills"],
+    ["🧸","Childcare"],["💼","Unemployment"],["⚖️","Free legal aid"],["🤰","WIC & nutrition"]];
+  const ul=document.getElementById('marquee');
+  const make=()=>items.map(([e,t])=>`<li><span>${e}</span>${t}</li>`).join("");
+  ul.innerHTML=make()+make(); // duplicate for seamless loop
+})();
 
-function el(html){const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstChild;}
-function scrollDown(){chat.scrollTop = chat.scrollHeight;}
+// ===== cursor spotlight (desktop) =====
+(function(){
+  const sp=document.getElementById('spotlight');
+  if(matchMedia('(pointer:fine)').matches){
+    window.addEventListener('mousemove',e=>{sp.style.opacity=1;sp.style.left=e.clientX+'px';sp.style.top=e.clientY+'px';});
+  }
+})();
 
-const botIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg>';
-const userIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>';
+// ===== magnetic buttons =====
+document.querySelectorAll('.magnetic').forEach(btn=>{
+  btn.addEventListener('mousemove',e=>{
+    const r=btn.getBoundingClientRect();
+    btn.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.18}px,${(e.clientY-r.top-r.height/2)*.3-3}px)`;
+  });
+  btn.addEventListener('mouseleave',()=>btn.style.transform='');
+});
 
-function addUser(text){
-  const m = el(`<div class="msg user"><div class="mini">${userIcon}</div><div class="bubble"></div></div>`);
-  m.querySelector('.bubble').textContent = text;
-  chat.appendChild(m); scrollDown();
+// ===== sticky nav state =====
+addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',scrollY>20));
+
+// ===== count-up stats =====
+function countUp(el){
+  const target=+el.dataset.count, suf=el.dataset.suffix||'';
+  let t0=null;const dur=1400;
+  function step(ts){ if(!t0)t0=ts; const p=Math.min((ts-t0)/dur,1);
+    el.textContent=Math.round(target*(1-Math.pow(1-p,3)))+suf; if(p<1)requestAnimationFrame(step); }
+  requestAnimationFrame(step);
 }
 
+// ===== scroll reveal + triggers =====
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){
+    e.target.classList.add('in');
+    e.target.querySelectorAll&&e.target.querySelectorAll('[data-count]').forEach(countUp);
+    io.unobserve(e.target);
+  }
+}),{threshold:.14});
+document.querySelectorAll('.reveal').forEach((el,i)=>{el.style.transitionDelay=(i%3*90)+'ms';io.observe(el);});
+
+/* =================== CHAT LOGIC =================== */
+const chat=document.getElementById('chat'), input=document.getElementById('input'),
+      sendBtn=document.getElementById('send'), steps=[...document.querySelectorAll('.step')],
+      rail=document.getElementById('rail');
+
+let sessionId=localStorage.getItem('bn_session')||(crypto.randomUUID?crypto.randomUUID():Date.now()+''+Math.random());
+localStorage.setItem('bn_session',sessionId);
+
+function el(html){const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstChild;}
+function scrollDown(){chat.scrollTop=chat.scrollHeight;}
+const botIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg>';
+const userIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>';
+
+function addUser(text){
+  const m=el(`<div class="msg user"><div class="mini">${userIcon}</div><div class="bubble"></div></div>`);
+  m.querySelector('.bubble').textContent=text; chat.appendChild(m); scrollDown();
+}
 function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-// Turn the agent's plain-text reply into nicely styled HTML
 function renderReply(text){
-  text = (text||'').replace(/\*\*/g,'').replace(/^\s*[-*]\s+/gm,''); // strip markdown bold / bullets
-  const linkify = s => s.replace(/(https?:\/\/[^\s)]+)/g,'<a href="$1" target="_blank" rel="noopener">$1 ↗</a>');
-  // Split into program blocks if the agent used "---" separators
-  const blocks = text.split(/\n-{2,}\n?/).map(b=>b.trim()).filter(Boolean);
-  const looksStructured = /LIKELY ELIGIBLE|MIGHT QUALIFY|PROBABLY NOT/i.test(text);
-
-  if(!looksStructured){
-    return `<div class="bubble">${linkify(escapeHtml(text)).replace(/\n/g,'<br>')}</div>`;
-  }
-
-  let html = '<div class="bubble">';
+  text=(text||'').replace(/\*\*/g,'').replace(/^\s*[-*]\s+/gm,'');
+  const linkify=s=>s.replace(/(https?:\/\/[^\s)]+)/g,'<a href="$1" target="_blank" rel="noopener">$1 ↗</a>');
+  const blocks=text.split(/\n-{2,}\n?/).map(b=>b.trim()).filter(Boolean);
+  const looksStructured=/LIKELY ELIGIBLE|MIGHT QUALIFY|PROBABLY NOT/i.test(text);
+  if(!looksStructured) return `<div class="bubble">${linkify(escapeHtml(text)).replace(/\n/g,'<br>')}</div>`;
+  let html='<div class="bubble">';
   blocks.forEach(block=>{
-    const isProgram = /LIKELY ELIGIBLE|MIGHT QUALIFY|PROBABLY NOT/i.test(block);
-    if(!isProgram){
-      html += `<p>${linkify(escapeHtml(block)).replace(/\n/g,'<br>')}</p>`;
-      return;
+    if(!/LIKELY ELIGIBLE|MIGHT QUALIFY|PROBABLY NOT/i.test(block)){
+      html+=`<p>${linkify(escapeHtml(block)).replace(/\n/g,'<br>')}</p>`; return;
     }
-    const lines = block.split('\n').map(l=>l.trim()).filter(Boolean);
-    let badge='', name='', rows='', link='';
+    const lines=block.split('\n').map(l=>l.trim()).filter(Boolean);
+    let badge='',name='',rows='',link='';
     lines.forEach(line=>{
-      if(/✅|LIKELY ELIGIBLE/i.test(line)){badge=`<span class="badge ok">✅ Likely eligible</span>`;}
-      else if(/⚠️|MIGHT QUALIFY/i.test(line)){badge=`<span class="badge maybe">⚠️ Might qualify</span>`;}
-      else if(/❌|PROBABLY NOT/i.test(line)){badge=`<span class="badge no">❌ Probably not</span>`;}
-      else if(/^link:/i.test(line)){
-        const url=(line.match(/(https?:\/\/[^\s)]+)/)||[])[0];
-        if(url) link=`<a class="applylink" href="${url}" target="_blank" rel="noopener">Apply / Learn more ↗</a>`;
-      }
+      if(/✅|LIKELY ELIGIBLE/i.test(line))badge=`<span class="badge ok">✅ Likely eligible</span>`;
+      else if(/⚠️|MIGHT QUALIFY/i.test(line))badge=`<span class="badge maybe">⚠️ Might qualify</span>`;
+      else if(/❌|PROBABLY NOT/i.test(line))badge=`<span class="badge no">❌ Probably not</span>`;
+      else if(/^link:/i.test(line)){const url=(line.match(/(https?:\/\/[^\s)]+)/)||[])[0];
+        if(url)link=`<a class="applylink" href="${url}" target="_blank" rel="noopener">Apply / Learn more ↗</a>`;}
       else if(/^(overview|about|why|documents needed|how to apply|where|location|available|cost|eligibility):/i.test(line)){
         let [k,...rest]=line.split(':');
         k=k.trim().replace(/^overview$/i,'What it is').replace(/^where$/i,'Where to get it');
         rows+=`<div class="row"><b>${escapeHtml(k)}:</b> ${linkify(escapeHtml(rest.join(':').trim()))}</div>`;
       }
-      else if(!name && line.length<90){name=escapeHtml(line);}
+      else if(!name&&line.length<90)name=escapeHtml(line);
     });
-    html += `<div class="pcard">${badge}<div class="pname">${name||'Program'}</div>${rows}${link}</div>`;
+    html+=`<div class="pcard">${badge}<div class="pname">${name||'Program'}</div>${rows}${link}</div>`;
   });
-  html += '</div>';
-  return html;
+  return html+'</div>';
 }
 
-function setSteps(state){ // 'idle' | 'intake' | 'research' | 'eligibility' | 'done'
-  const order = ['intake','research','eligibility'];
+function setSteps(state){
+  const order=['intake','research','eligibility'];
   steps.forEach(s=>s.classList.remove('active','done'));
-  if(state==='idle') return;
-  if(state==='done'){steps.forEach(s=>s.classList.add('done'));return;}
-  const idx = order.indexOf(state);
-  steps.forEach((s,i)=>{ if(i<idx)s.classList.add('done'); if(i===idx)s.classList.add('active'); });
+  if(state==='idle'){rail.style.width='0';return;}
+  if(state==='done'){steps.forEach(s=>s.classList.add('done'));rail.style.width='100%';return;}
+  const idx=order.indexOf(state);
+  steps.forEach((s,i)=>{if(i<idx)s.classList.add('done');if(i===idx)s.classList.add('active');});
+  rail.style.width=(idx/(order.length-1)*100)+'%';
 }
 
-let typingEl=null, pipelineTimer=null;
+let typingEl=null,pipelineTimer=null;
 function showTyping(){
-  typingEl = el(`<div class="msg bot"><div class="mini">${botIcon}</div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>`);
+  typingEl=el(`<div class="msg bot"><div class="mini">${botIcon}</div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>`);
   chat.appendChild(typingEl); scrollDown();
-  // animate the pipeline through the three agents while we wait
-  const seq=['intake','research','eligibility']; let i=0;
-  setSteps('intake');
-  pipelineTimer=setInterval(()=>{ i=(i+1)%seq.length; setSteps(seq[i]); },1400);
+  const seq=['intake','research','eligibility'];let i=0;setSteps('intake');
+  pipelineTimer=setInterval(()=>{i=(i+1)%seq.length;setSteps(seq[i]);},1400);
 }
-function clearTyping(){ if(typingEl){typingEl.remove();typingEl=null;} if(pipelineTimer){clearInterval(pipelineTimer);pipelineTimer=null;} }
+function clearTyping(){if(typingEl){typingEl.remove();typingEl=null;}if(pipelineTimer){clearInterval(pipelineTimer);pipelineTimer=null;}}
 
 async function send(text){
   text=(text||input.value).trim();
-  if(!text || sendBtn.disabled) return;
-  input.value='';
-  addUser(text);
-  sendBtn.disabled=true;
-  showTyping();
+  if(!text||sendBtn.disabled)return;
+  input.value=''; addUser(text); sendBtn.disabled=true; showTyping();
   try{
-    const res = await fetch('/api/chat',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({session_id:sessionId,message:text})
-    });
-    const data = await res.json();
-    clearTyping();
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({session_id:sessionId,message:text})});
+    const data=await res.json(); clearTyping();
     if(data.error){
       const m=el(`<div class="msg bot"><div class="mini">${botIcon}</div></div>`);
-      m.appendChild(el(`<div class="bubble">⚠️ ${escapeHtml(data.error)}</div>`));
-      chat.appendChild(m);
+      m.appendChild(el(`<div class="bubble">⚠️ ${escapeHtml(data.error)}</div>`)); chat.appendChild(m);
     }else{
       setSteps('done');
       const m=el(`<div class="msg bot"><div class="mini">${botIcon}</div></div>`);
-      m.appendChild(el(renderReply(data.reply||'…')));
-      chat.appendChild(m);
-      setTimeout(()=>setSteps('idle'),2200);
+      m.appendChild(el(renderReply(data.reply||'…'))); chat.appendChild(m);
+      setTimeout(()=>setSteps('idle'),2400);
     }
   }catch(e){
     clearTyping();
     const m=el(`<div class="msg bot"><div class="mini">${botIcon}</div><div class="bubble">⚠️ Could not reach the server. Is it running?</div></div>`);
     chat.appendChild(m);
-  }finally{
-    sendBtn.disabled=false; scrollDown(); input.focus();
-  }
+  }finally{sendBtn.disabled=false;scrollDown();input.focus();}
 }
 
 sendBtn.addEventListener('click',()=>send());
-input.addEventListener('keydown',e=>{ if(e.key==='Enter')send(); });
+input.addEventListener('keydown',e=>{if(e.key==='Enter')send();});
 document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>send(c.dataset.q)));
 
-// greeting
 setTimeout(()=>{
   const m=el(`<div class="msg bot"><div class="mini">${botIcon}</div><div class="bubble">Hi, I'm here to help. 💚 Tell me what you're going through — for example, “I lost my job and have two kids to feed” — and I'll find New Jersey programs you may qualify for. Everything you share stays private.</div></div>`);
   chat.appendChild(m); scrollDown();
-},500);
-
-// scroll reveal
-const io = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);} }),{threshold:.12});
-document.querySelectorAll('.reveal').forEach((el,i)=>{ el.style.transitionDelay=(i%4*80)+'ms'; io.observe(el); });
+},600);
 </script>
 </body>
 </html>
