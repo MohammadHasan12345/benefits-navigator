@@ -93,26 +93,39 @@ Return ONLY JSON: {"categories": string[], "summary": string, "circumstances": s
     // 2) RESEARCH — pull matching programs from Supabase (or bundled fallback)
     const programs = await getPrograms(cats);
 
-    // 3) ELIGIBILITY — produce the warm, structured checklist the UI renders as cards
+    // 3) ELIGIBILITY — talk like a real caseworker, grounded ONLY in the NJ programs we found
     const eligPrompt =
-`You are an eligibility specialist helping NJ residents understand which assistance programs they may qualify for.
+`You are Benefits Navigator — a warm, human New Jersey caseworker, NOT a generic chatbot.
+You speak with genuine empathy and you ONLY recommend the real NJ programs listed below. Never invent programs.
 
-User profile: ${JSON.stringify(profile)}
-Programs found (JSON): ${JSON.stringify(programs)}
+The person said: """${msg}"""
+What we understand about them: ${JSON.stringify(profile)}
+Real NJ programs to consider (JSON): ${JSON.stringify(programs)}
 
-Start with ONE short, warm sentence of reassurance. Then, for EACH program, output EXACTLY this block:
+Reply in EXACTLY this structure:
+
+1. Open with 1-2 warm, human sentences that acknowledge their SPECIFIC situation and reassure them
+   (e.g. "I'm really sorry you're going through this — losing a job is so stressful, and you're not alone.").
+   Sound like a caring person, not a form.
+2. Then a line containing only: ---
+3. Then, for EACH relevant program, a block followed by a line containing only --- :
 
 ✅ LIKELY ELIGIBLE
 <Program Name>
-Why: <one sentence, based on the user's situation>
+Overview: <1 plain-language sentence on what this program actually gives them>
+Why: <1 sentence connecting it to THEIR specific situation>
 Documents needed: <comma-separated list>
-How to apply: <one short sentence>
+How to apply: <1 short sentence>
+Where: <where/how to get it, e.g. "Apply online, or in person at your county welfare/social services office — available statewide in New Jersey">
 Link: <apply_link>
----
 
-Use "⚠️ MIGHT QUALIFY" if more info is needed, or "❌ PROBABLY NOT" if they likely do not qualify (put PROBABLY NOT programs last).
-RULES: Never say "you qualify" — say "you may qualify" or "you are likely eligible". No legal or medical advice.
-End with exactly: "This is not legal or financial advice. Please contact each program directly to confirm eligibility."`;
+   Use "⚠️ MIGHT QUALIFY" if more info is needed, or "❌ PROBABLY NOT" (list those last).
+4. After the last program's ---, close with 1-2 encouraging sentences AND one friendly follow-up
+   question to keep helping (e.g. "Would you like me to walk you through gathering the documents for any of these?").
+5. Final line, EXACTLY: "This is not legal or financial advice. Please contact each program directly to confirm eligibility."
+
+RULES: Never say "you qualify" — say "you may qualify" / "you're likely eligible". No legal or medical advice.
+Be warm, personal and conversational. Use "you", contractions, and real empathy. No markdown asterisks.`;
 
     const reply = await gemini(key, eligPrompt, false);
     await logMessage(sid, "assistant", reply);

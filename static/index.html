@@ -369,6 +369,7 @@ function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 
 // Turn the agent's plain-text reply into nicely styled HTML
 function renderReply(text){
+  text = (text||'').replace(/\*\*/g,'').replace(/^\s*[-*]\s+/gm,''); // strip markdown bold / bullets
   const linkify = s => s.replace(/(https?:\/\/[^\s)]+)/g,'<a href="$1" target="_blank" rel="noopener">$1 ↗</a>');
   // Split into program blocks if the agent used "---" separators
   const blocks = text.split(/\n-{2,}\n?/).map(b=>b.trim()).filter(Boolean);
@@ -395,9 +396,10 @@ function renderReply(text){
         const url=(line.match(/(https?:\/\/[^\s)]+)/)||[])[0];
         if(url) link=`<a class="applylink" href="${url}" target="_blank" rel="noopener">Apply / Learn more ↗</a>`;
       }
-      else if(/^(why|documents needed|how to apply):/i.test(line)){
-        const [k,...rest]=line.split(':');
-        rows+=`<div class="row"><b>${escapeHtml(k.trim())}:</b> ${linkify(escapeHtml(rest.join(':').trim()))}</div>`;
+      else if(/^(overview|about|why|documents needed|how to apply|where|location|available|cost|eligibility):/i.test(line)){
+        let [k,...rest]=line.split(':');
+        k=k.trim().replace(/^overview$/i,'What it is').replace(/^where$/i,'Where to get it');
+        rows+=`<div class="row"><b>${escapeHtml(k)}:</b> ${linkify(escapeHtml(rest.join(':').trim()))}</div>`;
       }
       else if(!name && line.length<90){name=escapeHtml(line);}
     });
