@@ -4,18 +4,64 @@
 
 const CATEGORIES = ["food", "housing", "healthcare", "utilities", "childcare", "legal", "employment"];
 
-// Bundled copy of the NJ programs. Used as a graceful fallback when Supabase
-// isn't configured yet, so the site works the moment GEMINI_API_KEY is set.
-const FALLBACK_PROGRAMS = [
-  { name: "NJ SNAP (Food Stamps)", category: "food", description: "Monthly food assistance benefits loaded onto an EBT card", eligibility: "NJ residents with low income, any immigration status may apply", documents: ["Photo ID", "Proof of NJ residence", "Proof of income or unemployment"], apply_link: "https://www.nj.gov/humanservices/njsnap/" },
-  { name: "NJ WIC Program", category: "food", description: "Food, nutrition counseling for pregnant women, new mothers, and children under 5", eligibility: "Pregnant, postpartum, or breastfeeding women; infants and children under 5 with low income", documents: ["Proof of identity", "Proof of NJ residence", "Proof of income", "Medical documentation if available"], apply_link: "https://www.nj.gov/health/fhs/wic/" },
-  { name: "NJ FamilyCare (Medicaid)", category: "healthcare", description: "Free or low cost health insurance for NJ residents", eligibility: "NJ residents who meet income limits, includes children, parents, pregnant women", documents: ["Proof of identity", "Proof of NJ residence", "Proof of income", "Social Security number if available"], apply_link: "https://www.njfamilycare.org/" },
-  { name: "LIHEAP (Utility Assistance)", category: "utilities", description: "Help paying heating and cooling energy bills", eligibility: "NJ residents with low income who pay energy bills", documents: ["Photo ID", "Proof of NJ residence", "Proof of income", "Recent utility bill"], apply_link: "https://dcaid.dca.nj.gov/en-US/" },
-  { name: "NJ Rental / Housing Assistance", category: "housing", description: "Rental help and eviction-prevention assistance for NJ residents facing hardship", eligibility: "NJ renters experiencing financial hardship", documents: ["Photo ID", "Proof of NJ residence", "Lease agreement", "Proof of income", "Eviction notice if applicable"], apply_link: "https://nj211.org/housing-assistance-for-renters" },
-  { name: "NJ Child Care Assistance (CCAP)", category: "childcare", description: "Subsidized childcare for working low income families", eligibility: "Working or in school NJ parents with children under 13 with low income", documents: ["Proof of identity", "Proof of NJ residence", "Proof of income", "Proof of employment or school enrollment", "Child birth certificate"], apply_link: "https://www.childcarenj.gov/" },
-  { name: "NJ Legal Services", category: "legal", description: "Free civil legal help for low income NJ residents including immigration issues", eligibility: "Low income NJ residents needing civil legal assistance", documents: ["Photo ID", "Description of legal issue"], apply_link: "https://www.lsnj.org/" },
-  { name: "NJ Unemployment Insurance", category: "employment", description: "Weekly payments if you lost your job through no fault of your own", eligibility: "NJ workers who lost jobs involuntarily and meet wage requirements", documents: ["Social Security number", "Work history for past 18 months", "Banking info for direct deposit"], apply_link: "https://www.nj.gov/labor/myunemployment/" }
+const STATE_NAMES = {
+  AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",
+  DC:"District of Columbia",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",
+  KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",
+  MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",
+  NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",
+  PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",
+  VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"
+};
+
+// These safety-net programs are FEDERAL but run by each state. The `find` URL is the
+// official federal "find help in your state" directory — it works for all 50 states.
+const PROGRAM_TYPES = [
+  { category:"food", name:"SNAP (Food Assistance)", description:"Monthly money on an EBT card to help buy groceries.", documents:["Photo ID","Proof of residence","Proof of income or unemployment"], find:"https://www.fns.usda.gov/snap/state-directory" },
+  { category:"food", name:"WIC (Women, Infants & Children)", description:"Healthy food, formula and nutrition support for pregnant people, new parents and children under 5.", documents:["Photo ID","Proof of residence","Proof of income","Pregnancy or medical documentation if available"], find:"https://www.signupwic.com/" },
+  { category:"healthcare", name:"Medicaid / CHIP", description:"Free or low-cost health insurance for people and children with low income.", documents:["Photo ID","Proof of residence","Proof of income","Social Security number if available"], find:"https://www.medicaid.gov/about-us/where-can-people-get-help-medicaid-chip/index.html" },
+  { category:"utilities", name:"LIHEAP (Energy Bill Help)", description:"Help paying heating, cooling and utility bills.", documents:["Photo ID","Proof of residence","Proof of income","Recent utility bill"], find:"https://www.acf.gov/ocs/map/liheap-map-state-and-territory-contact-listing" },
+  { category:"housing", name:"Housing & Rental Assistance", description:"Rental help, eviction prevention and housing vouchers for people facing hardship.", documents:["Photo ID","Proof of residence","Lease agreement","Proof of income","Eviction notice if applicable"], find:"https://www.hud.gov/states" },
+  { category:"childcare", name:"Child Care Assistance (CCDF)", description:"Help paying for child care so parents can work, train or go to school.", documents:["Photo ID","Proof of residence","Proof of income","Proof of work, training or school","Child's birth certificate"], find:"https://childcare.gov/state-resources" },
+  { category:"legal", name:"Free Legal Aid", description:"Free civil legal help with housing, family, immigration and more for people with low income.", documents:["Photo ID","A short description of your legal issue"], find:"https://www.lawhelp.org/" },
+  { category:"employment", name:"Unemployment Insurance", description:"Weekly payments if you lost your job through no fault of your own.", documents:["Social Security number","Work history for the past 18 months","Bank info for direct deposit"], find:"https://www.careeronestop.org/LocalHelp/UnemploymentBenefits/find-unemployment-benefits.aspx" }
 ];
+
+// One-stop state benefits portals (apply for several programs in one place). Verified.
+const STATE_PORTALS = {
+  NJ:"https://www.mynjhelps.gov/", CA:"https://benefitscal.com/", TX:"https://www.yourtexasbenefits.com/",
+  NY:"https://mybenefits.ny.gov/", PA:"https://www.compass.dhs.pa.gov/home/", IL:"https://abe.illinois.gov/",
+  GA:"https://gateway.ga.gov/"
+};
+
+// Curated per-program deep links for flagship states (most accurate). Other states
+// fall back to the federal `find` directory above.
+const STATE_PROGRAM_LINKS = {
+  NJ:{
+    "SNAP (Food Assistance)":"https://www.nj.gov/humanservices/njsnap/",
+    "WIC (Women, Infants & Children)":"https://www.nj.gov/health/fhs/wic/",
+    "Medicaid / CHIP":"https://www.njfamilycare.org/",
+    "LIHEAP (Energy Bill Help)":"https://dcaid.dca.nj.gov/en-US/",
+    "Housing & Rental Assistance":"https://nj211.org/housing-assistance-for-renters",
+    "Child Care Assistance (CCDF)":"https://www.childcarenj.gov/",
+    "Free Legal Aid":"https://www.lsnj.org/",
+    "Unemployment Insurance":"https://www.nj.gov/labor/myunemployment/"
+  }
+};
+
+function resolveLink(state, prog) {
+  return (STATE_PROGRAM_LINKS[state] && STATE_PROGRAM_LINKS[state][prog.name]) || prog.find;
+}
+
+// Build the program list for a given state + the categories the user needs.
+function buildPrograms(state, categories) {
+  const wanted = categories.length ? PROGRAM_TYPES.filter(p => categories.includes(p.category)) : PROGRAM_TYPES;
+  const list = wanted.length ? wanted : PROGRAM_TYPES;
+  return list.map(p => ({
+    name: p.name, category: p.category, description: p.description,
+    documents: p.documents, apply_link: resolveLink(state, p)
+  }));
+}
 
 async function gemini(key, prompt, asJson) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`;
@@ -25,27 +71,6 @@ async function gemini(key, prompt, asJson) {
   if (!r.ok) throw new Error(`Gemini ${r.status}: ${(await r.text()).slice(0, 300)}`);
   const data = await r.json();
   return data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-}
-
-async function getPrograms(categories) {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_ANON_KEY;
-  if (url && key) {
-    try {
-      let q = `${url}/rest/v1/programs?select=*`;
-      if (categories.length) q += `&category=in.(${categories.map(encodeURIComponent).join(",")})`;
-      const r = await fetch(q, { headers: { apikey: key, Authorization: `Bearer ${key}` }});
-      if (r.ok) {
-        const rows = await r.json();
-        if (Array.isArray(rows) && rows.length) return rows;
-      }
-    } catch (_) { /* fall through to bundled data */ }
-  }
-  if (categories.length) {
-    const hits = FALLBACK_PROGRAMS.filter(p => categories.includes(p.category));
-    if (hits.length) return hits;
-  }
-  return FALLBACK_PROGRAMS;
 }
 
 async function logMessage(session_id, role, content) {
@@ -68,6 +93,9 @@ module.exports = async (req, res) => {
   const body = typeof req.body === "string" ? safeParse(req.body) : (req.body || {});
   const msg = (body.message || "").trim();
   const sid = body.session_id || Math.random().toString(36).slice(2);
+  const state = STATE_NAMES[(body.state || "NJ").toUpperCase()] ? (body.state || "NJ").toUpperCase() : "NJ";
+  const stateNm = STATE_NAMES[state];
+  const portal = STATE_PORTALS[state];
 
   if (!msg) { res.status(400).json({ error: "Please enter a message." }); return; }
   if (!key) {
@@ -80,7 +108,7 @@ module.exports = async (req, res) => {
 
     // 1) INTAKE — understand the situation, pick categories
     const intakePrompt =
-`You are a compassionate intake assistant for New Jersey assistance programs.
+`You are a compassionate intake assistant for U.S. assistance programs.
 From the user's message, decide which help categories apply.
 Valid categories: ${CATEGORIES.join(", ")}.
 User message: """${msg}"""
@@ -90,17 +118,19 @@ Return ONLY JSON: {"categories": string[], "summary": string, "circumstances": s
     try { profile = JSON.parse(await gemini(key, intakePrompt, true)); } catch (_) {}
     const cats = (profile.categories || []).filter(c => CATEGORIES.includes(c));
 
-    // 2) RESEARCH — pull matching programs from Supabase (or bundled fallback)
-    const programs = await getPrograms(cats);
+    // 2) RESEARCH — resolve programs + the correct apply links for THIS state
+    const programs = buildPrograms(state, cats);
 
-    // 3) ELIGIBILITY — talk like a real caseworker, grounded ONLY in the NJ programs we found
+    // 3) ELIGIBILITY — talk like a real caseworker, grounded ONLY in the programs we found
     const eligPrompt =
-`You are Benefits Navigator — a warm, human New Jersey caseworker, NOT a generic chatbot.
-You speak with genuine empathy and you ONLY recommend the real NJ programs listed below. Never invent programs.
+`You are Benefits Navigator — a warm, human caseworker for ${stateNm}, NOT a generic chatbot.
+You speak with genuine empathy and you ONLY recommend the real programs listed below. Never invent programs.
 
+The person lives in: ${stateNm}
 The person said: """${msg}"""
 What we understand about them: ${JSON.stringify(profile)}
-Real NJ programs to consider (JSON): ${JSON.stringify(programs)}
+Programs available in ${stateNm} to consider (JSON): ${JSON.stringify(programs)}
+${portal ? `${stateNm}'s one-stop online benefits portal (mention it in your closing as the easiest place to start): ${portal}` : ""}
 
 Reply in EXACTLY this structure:
 
@@ -115,8 +145,8 @@ Reply in EXACTLY this structure:
 Overview: <1 plain-language sentence on what this program actually gives them>
 Why: <1 sentence connecting it to THEIR specific situation>
 Documents needed: <comma-separated list>
-How to apply: <1 short sentence>
-Where: <where/how to get it, e.g. "Apply online, or in person at your county welfare/social services office — available statewide in New Jersey">
+How to apply: <1 short sentence on how to apply in ${stateNm}>
+Where: <where/how to get it in ${stateNm}, e.g. "Apply online or at your local county social services office — available across ${stateNm}">
 Link: <apply_link>
 
    Use "⚠️ MIGHT QUALIFY" if more info is needed, or "❌ PROBABLY NOT" (list those last).
@@ -126,7 +156,7 @@ Link: <apply_link>
 
 RULES: Never say "you qualify" — say "you may qualify" / "you're likely eligible". No legal or medical advice.
 For the "Link:" line, copy the program's apply_link EXACTLY as given — never invent, shorten, guess, or modify a URL.
-Be warm, personal and conversational. Use "you", contractions, and real empathy. No markdown asterisks.`;
+Tailor wording to ${stateNm}. Be warm, personal and conversational. Use "you", contractions, and real empathy. No markdown asterisks.`;
 
     const reply = await gemini(key, eligPrompt, false);
     await logMessage(sid, "assistant", reply);

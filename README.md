@@ -1,8 +1,14 @@
 # Benefits Navigator 🧭
 
-An AI assistant that helps **New Jersey** residents discover assistance programs they may
-qualify for — described in plain language, returned as a clear, step-by-step action checklist.
-No jargon, no judgment, no SSN required.
+An AI assistant that helps people **across all 50 U.S. states** discover government
+assistance programs they may qualify for — pick your state, describe your situation in plain
+language, and get a clear, step-by-step action checklist. No jargon, no judgment, no SSN required.
+
+**How it stays accurate nationwide:** the safety-net programs (SNAP, WIC, Medicaid/CHIP, LIHEAP,
+housing, child care, legal aid, unemployment) are federal but run by each state. Apply links
+resolve per state — New Jersey and several flagship states use curated deep links, and every
+other state routes through the official federal "find help in your state" directory, with a
+**2-1-1** fallback so there's always a working path.
 
 > _This is not legal or financial advice. Always confirm eligibility with each program directly._
 
@@ -29,10 +35,11 @@ main.py / agents/    Python ADK reference (not deployed)
 
 ## Deploy to Vercel + Supabase
 
-### 1. Supabase (database)
+### 1. Supabase (optional — for the conversation log)
+The nationwide program data + per-state links now live in `api/chat.js`, so Supabase is
+**optional**. It's only used to log conversations to the `messages` table.
 1. Create a project at [supabase.com](https://supabase.com).
 2. **SQL Editor → New query**, paste [`supabase/schema.sql`](supabase/schema.sql), **Run**.
-   (Creates `programs` + `messages` and seeds the NJ programs.)
 3. **Project Settings → API**: copy the **Project URL** and the **anon public** key.
 
 ### 2. Vercel (frontend + function)

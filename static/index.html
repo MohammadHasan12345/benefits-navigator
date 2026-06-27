@@ -65,6 +65,18 @@
   .nav-link:hover{color:var(--teal)}
   .nav-pill{font-size:.78rem;font-weight:700;color:var(--teal);background:rgba(15,118,110,.10);
     padding:8px 14px;border-radius:999px;border:1px solid var(--line)}
+  /* state picker */
+  .state-picker{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);
+    border-radius:999px;padding:6px 8px 6px 13px;box-shadow:var(--shadow-sm);transition:border-color .2s,box-shadow .2s}
+  .state-picker:hover{border-color:var(--teal-2)}
+  .state-picker svg{width:15px;height:15px;color:var(--teal)}
+  .state-picker select{font:inherit;font-size:.84rem;font-weight:700;color:var(--ink);border:none;background:transparent;
+    outline:none;cursor:pointer;padding-right:2px;max-width:170px}
+  .state-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);z-index:80;
+    background:var(--ink);color:#fff;font-size:.86rem;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;display:flex;align-items:center;gap:8px}
+  .state-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .state-toast svg{width:16px;height:16px;color:var(--teal-2)}
 
   /* ===== hero ===== */
   header.hero{padding:64px 0 34px;text-align:center;position:relative}
@@ -354,7 +366,10 @@
   <div class="nav-right">
     <a class="nav-link" href="#how">How it works</a>
     <a class="nav-link" href="#why">Why it's different</a>
-    <span class="nav-pill">NJ · Free &amp; Private</span>
+    <div class="state-picker">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <select id="stateSelect" aria-label="Select your state"></select>
+    </div>
   </div>
 </nav>
 
@@ -362,7 +377,7 @@
   <header class="hero">
     <div class="eyebrow"><span class="dot"></span> Powered by a 3-agent AI assistant</div>
     <h1 id="headline"></h1>
-    <p class="sub">Real New Jersey help for
+    <p class="sub">Real <span id="heroState">New Jersey</span> help for
       <span class="rotor"><span>food&nbsp;🍎<br>rent&nbsp;🏠<br>healthcare&nbsp;🩺<br>utilities&nbsp;💡<br>childcare&nbsp;🧸<br>food&nbsp;🍎</span></span>
       — described in your own words, returned as a clear action plan.</p>
     <div class="cta-row">
@@ -437,7 +452,7 @@
   <section class="sec" id="why">
     <div class="kicker reveal">Not just another chatbot</div>
     <h2 class="reveal">Why this beats a generic AI</h2>
-    <p class="lead reveal">Generic assistants guess. Benefits Navigator is grounded in real, verified New Jersey programs — and acts like a caseworker, not a search box.</p>
+    <p class="lead reveal">Generic assistants guess. Benefits Navigator is grounded in real, verified government programs for your state — and acts like a caseworker, not a search box.</p>
     <div class="compare">
       <div class="col generic reveal">
         <h3><span class="tag g">Generic AI</span></h3>
@@ -476,7 +491,7 @@
         <div class="num">STEP 02</div>
         <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
         <h3>The Research Agent searches</h3>
-        <p>It scans a verified New Jersey program database — food, housing, healthcare, utilities, childcare, legal and employment — to find every match.</p>
+        <p>It scans verified government programs for your state — food, housing, healthcare, utilities, childcare, legal and employment — to find every match.</p>
       </div>
       <div class="feature reveal">
         <div class="num">STEP 03</div>
@@ -517,6 +532,8 @@
     Saved privately on this device only
   </div>
 </aside>
+
+<div class="state-toast" id="stateToast"></div>
 
 <script>
 // ===== hero headline word-by-word reveal =====
@@ -594,6 +611,30 @@ let convId=localStorage.getItem(CUR_KEY)||'';
   c[convId]={id:convId,title:'',createdAt:Date.now(),updatedAt:Date.now(),messages:[]};
   saveConvos(c);localStorage.setItem(CUR_KEY,convId);}})();
 
+// ----- nationwide state selection -----
+const STATES=[["AL","Alabama"],["AK","Alaska"],["AZ","Arizona"],["AR","Arkansas"],["CA","California"],["CO","Colorado"],["CT","Connecticut"],["DE","Delaware"],["DC","District of Columbia"],["FL","Florida"],["GA","Georgia"],["HI","Hawaii"],["ID","Idaho"],["IL","Illinois"],["IN","Indiana"],["IA","Iowa"],["KS","Kansas"],["KY","Kentucky"],["LA","Louisiana"],["ME","Maine"],["MD","Maryland"],["MA","Massachusetts"],["MI","Michigan"],["MN","Minnesota"],["MS","Mississippi"],["MO","Missouri"],["MT","Montana"],["NE","Nebraska"],["NV","Nevada"],["NH","New Hampshire"],["NJ","New Jersey"],["NM","New Mexico"],["NY","New York"],["NC","North Carolina"],["ND","North Dakota"],["OH","Ohio"],["OK","Oklahoma"],["OR","Oregon"],["PA","Pennsylvania"],["RI","Rhode Island"],["SC","South Carolina"],["SD","South Dakota"],["TN","Tennessee"],["TX","Texas"],["UT","Utah"],["VT","Vermont"],["VA","Virginia"],["WA","Washington"],["WV","West Virginia"],["WI","Wisconsin"],["WY","Wyoming"]];
+function getState(){return localStorage.getItem('bn_state')||'NJ';}
+function stateName(){const s=STATES.find(x=>x[0]===getState());return s?s[1]:'your state';}
+function applyStateLabels(){
+  const nm=stateName();
+  const hs=document.getElementById('heroState'); if(hs)hs.textContent=nm;
+  document.title=`Benefits Navigator — Find help you may qualify for in ${nm}`;
+}
+function setState(code){
+  localStorage.setItem('bn_state',code);
+  applyStateLabels();
+  const toast=document.getElementById('stateToast');
+  toast.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Now finding help in <b>${stateName()}</b>`;
+  toast.classList.add('show'); clearTimeout(window.__stTo); window.__stTo=setTimeout(()=>toast.classList.remove('show'),2600);
+}
+(function initStateSelect(){
+  const sel=document.getElementById('stateSelect');
+  sel.innerHTML=STATES.map(([c,n])=>`<option value="${c}">${n}</option>`).join('');
+  sel.value=getState();
+  sel.addEventListener('change',()=>setState(sel.value));
+  applyStateLabels();
+})();
+
 function el(html){const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstChild;}
 function scrollDown(){chat.scrollTop=chat.scrollHeight;}
 const botIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg>';
@@ -662,7 +703,7 @@ async function send(text){
   input.value=''; addUser(text); recordMessage('user',text); sendBtn.disabled=true; showTyping();
   try{
     const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({session_id:convId,message:text})});
+      body:JSON.stringify({session_id:convId,message:text,state:getState()})});
     const data=await res.json(); clearTyping();
     if(data.error){
       const m=el(`<div class="msg bot"><div class="mini">${botIcon}</div></div>`);
@@ -698,7 +739,7 @@ function appendBot(text){
   m.appendChild(el(renderReply(text))); chat.appendChild(m); scrollDown();
 }
 function greeting(){
-  const m=el(`<div class="msg bot"><div class="mini">${botIcon}</div><div class="bubble">Hi, I'm here to help. 💚 Tell me what you're going through — for example, “I lost my job and have two kids to feed” — and I'll find New Jersey programs you may qualify for. Everything you share stays private.</div></div>`);
+  const m=el(`<div class="msg bot"><div class="mini">${botIcon}</div><div class="bubble">Hi, I'm here to help. 💚 You're set to <b>${escapeHtml(stateName())}</b> — change it up top anytime. Tell me what you're going through — for example, “I lost my job and have two kids to feed” — and I'll find programs in your state you may qualify for. Everything you share stays private.</div></div>`);
   chat.appendChild(m); scrollDown();
 }
 function renderMessages(msgs){ chat.innerHTML=''; msgs.forEach(m=> m.role==='user'?addUser(m.text):appendBot(m.text)); }
