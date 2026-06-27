@@ -75,7 +75,7 @@
   .state-picker .pin{width:16px;height:16px;color:var(--teal);flex-shrink:0}
   .state-picker .plabel{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--teal)}
   .state-picker select{font:inherit;font-size:.88rem;font-weight:800;color:var(--teal);border:none;background:transparent;
-    outline:none;cursor:pointer;padding-right:2px;max-width:160px}
+    outline:none;cursor:pointer;padding-right:2px;width:130px;text-align:center;text-align-last:center}
   @media(prefers-reduced-motion:reduce){.state-picker{animation:none}}
   .state-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);z-index:80;
     background:var(--ink);color:#fff;font-size:.86rem;font-weight:600;padding:11px 18px;border-radius:999px;
@@ -626,12 +626,32 @@ function applyStateLabels(){
   const hs=document.getElementById('heroState'); if(hs)hs.textContent=nm;
   document.title=`Benefits Navigator — Find help you may qualify for in ${nm}`;
 }
-function setState(code){
+// re-render the opening greeting (with the new state) only if the chat is still fresh
+function refreshGreetingIfEmpty(){
+  const c=loadConvos();
+  if(c[convId] && (!c[convId].messages || c[convId].messages.length===0)){ chat.innerHTML=''; greeting(); }
+}
+function setState(code,opts){
+  opts=opts||{};
   localStorage.setItem('bn_state',code);
+  const sel=document.getElementById('stateSelect'); if(sel)sel.value=code;
   applyStateLabels();
-  const toast=document.getElementById('stateToast');
-  toast.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Now finding help in <b>${stateName()}</b>`;
-  toast.classList.add('show'); clearTimeout(window.__stTo); window.__stTo=setTimeout(()=>toast.classList.remove('show'),2600);
+  refreshGreetingIfEmpty();          // update "You're set to ___" right away
+  if(!opts.silent){
+    const toast=document.getElementById('stateToast');
+    toast.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Now finding help in <b>${stateName()}</b>`;
+    toast.classList.add('show'); clearTimeout(window.__stTo); window.__stTo=setTimeout(()=>toast.classList.remove('show'),2600);
+  }
+}
+// guess the user's state from their IP on first visit (no permission prompt, nothing stored remotely)
+async function detectState(){
+  if(localStorage.getItem('bn_state')) return;           // respect an existing choice
+  try{
+    const r=await fetch('https://ipapi.co/json/'); if(!r.ok) return;
+    const d=await r.json();
+    const code=(d && d.country_code==='US') ? d.region_code : null;
+    if(code && STATES.some(s=>s[0]===code) && !localStorage.getItem('bn_state')) setState(code);
+  }catch(_){ /* keep default on any failure */ }
 }
 (function initStateSelect(){
   const sel=document.getElementById('stateSelect');
@@ -639,6 +659,7 @@ function setState(code){
   sel.value=getState();
   sel.addEventListener('change',()=>setState(sel.value));
   applyStateLabels();
+  detectState();
 })();
 
 function el(html){const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstChild;}
