@@ -66,12 +66,17 @@
   .nav-pill{font-size:.78rem;font-weight:700;color:var(--teal);background:rgba(15,118,110,.10);
     padding:8px 14px;border-radius:999px;border:1px solid var(--line)}
   /* state picker */
-  .state-picker{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);
-    border-radius:999px;padding:6px 8px 6px 13px;box-shadow:var(--shadow-sm);transition:border-color .2s,box-shadow .2s}
-  .state-picker:hover{border-color:var(--teal-2)}
-  .state-picker svg{width:15px;height:15px;color:var(--teal)}
-  .state-picker select{font:inherit;font-size:.84rem;font-weight:700;color:var(--ink);border:none;background:transparent;
-    outline:none;cursor:pointer;padding-right:2px;max-width:170px}
+  .state-picker{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:8px 12px 8px 14px;
+    background:linear-gradient(135deg,rgba(20,184,166,.14),rgba(16,185,129,.14));border:1.5px solid var(--teal-2);
+    box-shadow:0 6px 18px -10px rgba(15,118,110,.6);transition:transform .2s,box-shadow .2s;
+    animation:pickerPulse 2.4s ease-in-out 4}
+  .state-picker:hover{transform:translateY(-1px);box-shadow:0 10px 24px -10px rgba(15,118,110,.7)}
+  @keyframes pickerPulse{0%,100%{box-shadow:0 0 0 0 rgba(20,184,166,.5)}50%{box-shadow:0 0 0 8px rgba(20,184,166,0)}}
+  .state-picker .pin{width:16px;height:16px;color:var(--teal);flex-shrink:0}
+  .state-picker .plabel{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--teal)}
+  .state-picker select{font:inherit;font-size:.88rem;font-weight:800;color:var(--teal);border:none;background:transparent;
+    outline:none;cursor:pointer;padding-right:2px;max-width:160px}
+  @media(prefers-reduced-motion:reduce){.state-picker{animation:none}}
   .state-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);z-index:80;
     background:var(--ink);color:#fff;font-size:.86rem;font-weight:600;padding:11px 18px;border-radius:999px;
     box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;display:flex;align-items:center;gap:8px}
@@ -366,8 +371,9 @@
   <div class="nav-right">
     <a class="nav-link" href="#how">How it works</a>
     <a class="nav-link" href="#why">Why it's different</a>
-    <div class="state-picker">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <div class="state-picker" title="Choose your state to get local help">
+      <svg class="pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span class="plabel">Your state</span>
       <select id="stateSelect" aria-label="Select your state"></select>
     </div>
   </div>
@@ -674,7 +680,7 @@ function renderReply(text){
     });
     html+=`<div class="pcard">${badge}<div class="pname">${name||'Program'}</div>${rows}${link}</div>`;
   });
-  html+=`<div class="helpnote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> A link not opening? Dial <b>2-1-1</b> (free, 24/7) or visit <a href="https://nj211.org" target="_blank" rel="noopener">nj211.org ↗</a> for a live New Jersey navigator who can help you apply.</div>`;
+  html+=`<div class="helpnote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> A link not opening? Dial <b>2-1-1</b> (free, 24/7) or visit <a href="https://www.211.org" target="_blank" rel="noopener">211.org ↗</a> for a live ${stateName()} navigator who can help you apply.</div>`;
   return html+'</div>';
 }
 
