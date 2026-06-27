@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Benefits Navigator — Find help you may qualify for in New Jersey</title>
+<title>Benefits Navigator — Find help you may qualify for, in all 50 states</title>
 <style>
   :root{
     --bg:#f4f9f7;
@@ -75,7 +75,7 @@
   .state-picker .pin{width:16px;height:16px;color:var(--teal);flex-shrink:0}
   .state-picker .plabel{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--teal)}
   .state-picker select{font:inherit;font-size:.88rem;font-weight:800;color:var(--teal);border:none;background:transparent;
-    outline:none;cursor:pointer;padding-right:2px;width:130px;text-align:center;text-align-last:center}
+    outline:none;cursor:pointer;width:auto;min-width:96px;max-width:none;padding-right:4px;text-align:center;text-align-last:center}
   @media(prefers-reduced-motion:reduce){.state-picker{animation:none}}
   .state-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);z-index:80;
     background:var(--ink);color:#fff;font-size:.86rem;font-weight:600;padding:11px 18px;border-radius:999px;
@@ -383,7 +383,7 @@
   <header class="hero">
     <div class="eyebrow"><span class="dot"></span> Powered by a 3-agent AI assistant</div>
     <h1 id="headline"></h1>
-    <p class="sub">Real <span id="heroState">New Jersey</span> help for
+    <p class="sub">Real <span id="heroState">your state</span> help for
       <span class="rotor"><span>food&nbsp;🍎<br>rent&nbsp;🏠<br>healthcare&nbsp;🩺<br>utilities&nbsp;💡<br>childcare&nbsp;🧸<br>food&nbsp;🍎</span></span>
       — described in your own words, returned as a clear action plan.</p>
     <div class="cta-row">
@@ -400,7 +400,7 @@
     </div>
 
     <div class="stats reveal">
-      <div class="stat"><b data-count="8">0</b><small>NJ programs matched</small></div>
+      <div class="stat"><b data-count="50">0</b><small>states covered</small></div>
       <div class="stat"><b data-count="7">0</b><small>categories of help</small></div>
       <div class="stat"><b data-count="100" data-suffix="%">0</b><small>private &amp; free</small></div>
       <div class="stat"><b data-count="60" data-suffix="s">0</b><small>to an action plan</small></div>
@@ -440,7 +440,7 @@
       <button class="chip" data-q="My family needs health insurance. We have low income and two kids."><span class="e">🩺</span>Healthcare</button>
       <button class="chip" data-q="I'm struggling to pay my electricity and heating bills this month."><span class="e">💡</span>Utilities</button>
       <button class="chip" data-q="I'm a working parent and need help paying for childcare for my toddler."><span class="e">🧸</span>Childcare</button>
-      <button class="chip" data-q="I lost my job and want to apply for unemployment benefits in NJ."><span class="e">💼</span>Employment</button>
+      <button class="chip" data-q="I lost my job and want to apply for unemployment benefits."><span class="e">💼</span>Employment</button>
       <button class="chip" data-q="I need free legal help with an immigration issue."><span class="e">⚖️</span>Legal</button>
     </div>
 
@@ -472,7 +472,7 @@
       <div class="col ours reveal">
         <h3><span class="tag o">Benefits Navigator</span></h3>
         <ul>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Grounded in a <b>verified NJ database</b> — only real programs &amp; official .nj.gov links</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Grounded in <b>verified government programs</b> — only real programs &amp; official .gov links for your state</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Real <b>eligibility triage</b>: likely / maybe / probably not</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> A <b>ready action checklist</b>: documents, where &amp; how to apply</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> <b>Private by design</b> — never asks for SSN or income</li>
@@ -519,7 +519,7 @@
     <div class="disclaimer reveal">
       <b>This is not legal or financial advice.</b> Benefits Navigator helps you discover programs you <em>may</em> qualify for. Please contact each program directly to confirm your eligibility.
     </div>
-    Built for New Jersey families · Your information stays private
+    Built for families across all 50 states · Your information stays private
   </footer>
 </div>
 
