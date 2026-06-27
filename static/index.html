@@ -612,10 +612,16 @@ const CONVO_KEY='bn_convos', CUR_KEY='bn_current';
 function loadConvos(){try{return JSON.parse(localStorage.getItem(CONVO_KEY))||{}}catch(e){return {}}}
 function saveConvos(o){localStorage.setItem(CONVO_KEY,JSON.stringify(o));}
 function newId(){return crypto.randomUUID?crypto.randomUUID():Date.now()+''+Math.random();}
-let convId=localStorage.getItem(CUR_KEY)||'';
-(function(){const c=loadConvos();if(!convId||!c[convId]){convId=newId();
+let convId='';
+// Always start a brand-new chat each time the site loads. Past conversations
+// stay in the History drawer; empty ones are pruned so they don't pile up.
+(function(){
+  const c=loadConvos();
+  for(const id in c){ if(!c[id].messages || c[id].messages.length===0) delete c[id]; }
+  convId=newId();
   c[convId]={id:convId,title:'',createdAt:Date.now(),updatedAt:Date.now(),messages:[]};
-  saveConvos(c);localStorage.setItem(CUR_KEY,convId);}})();
+  saveConvos(c); localStorage.setItem(CUR_KEY,convId);
+})();
 
 // ----- nationwide state selection -----
 const STATES=[["AL","Alabama"],["AK","Alaska"],["AZ","Arizona"],["AR","Arkansas"],["CA","California"],["CO","Colorado"],["CT","Connecticut"],["DE","Delaware"],["DC","District of Columbia"],["FL","Florida"],["GA","Georgia"],["HI","Hawaii"],["ID","Idaho"],["IL","Illinois"],["IN","Indiana"],["IA","Iowa"],["KS","Kansas"],["KY","Kentucky"],["LA","Louisiana"],["ME","Maine"],["MD","Maryland"],["MA","Massachusetts"],["MI","Michigan"],["MN","Minnesota"],["MS","Mississippi"],["MO","Missouri"],["MT","Montana"],["NE","Nebraska"],["NV","Nevada"],["NH","New Hampshire"],["NJ","New Jersey"],["NM","New Mexico"],["NY","New York"],["NC","North Carolina"],["ND","North Dakota"],["OH","Ohio"],["OK","Oklahoma"],["OR","Oregon"],["PA","Pennsylvania"],["RI","Rhode Island"],["SC","South Carolina"],["SD","South Dakota"],["TN","Tennessee"],["TX","Texas"],["UT","Utah"],["VT","Vermont"],["VA","Virginia"],["WA","Washington"],["WV","West Virginia"],["WI","Wisconsin"],["WY","Wyoming"]];
